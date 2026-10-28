@@ -45,6 +45,15 @@
     "lang": "en"
   },
   {
+    "name": "Tunnelling Journal",
+    "category": "intl",
+    "type": "rss",
+    "url": "https://www.tunnellingjournal.com/feed/",
+    "weight": 1.0,
+    "limit": 12,
+    "lang": "en"
+  },
+  {
     "name": "Global Construction Review",
     "category": "intl",
     "type": "rss",
