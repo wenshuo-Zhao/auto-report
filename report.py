@@ -392,7 +392,7 @@ def main() -> int:
     out_file.write_text(md, encoding="utf-8")
     logging.info("已写入：%s", out_file)
 
-    title = f"{now:%m-%d} 情报｜{picked} 条精选"
+    title = f"{now:%m-%d} Rowan-Zhao早报｜{picked} 条精选"
     pushed = push_wechat(title, render_push_html(top, stats, now))
 
     print("\n" + "=" * 56)
