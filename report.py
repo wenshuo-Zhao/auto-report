@@ -307,7 +307,13 @@ def fmt_date(item: dict) -> str:
     return f"{item['published']:%m-%d}" if item["published"] else ""
 
 
-def render_markdown(top: dict[str, list[dict]], stats: dict, now: dt.datetime) -> str:
+def pick_lesson(lessons: list[dict], now: dt.datetime) -> dict | None:
+    if not lessons:
+        return None
+    return lessons[now.timetuple().tm_yday % len(lessons)]
+
+
+def render_markdown(top: dict[str, list[dict]], stats: dict, now: dt.datetime, lesson: dict | None) -> str:
     lines = [
         f"# 每日情报 · {now:%Y-%m-%d}",
         "",
@@ -325,13 +331,16 @@ def render_markdown(top: dict[str, list[dict]], stats: dict, now: dt.datetime) -
             lines.append(f"- [{item['title']}]({item['url']}){tag}{(' · ' + d) if d else ''}")
         lines.append("")
 
+    if lesson:
+        lines += [f"## 每日一学 · {lesson['title']}", "", f"> {lesson.get('tag', '')}", "", lesson["body"], ""]
+
     name, url = WATCHLIST[now.timetuple().tm_yday % len(WATCHLIST)]
     lines += ["## 今日盯一个", "", f"[{name}]({url}) — 点开看一眼有没有新公告。", ""]
-    lines += ["---", "", "改数据源：`sources.json`；改筛选权重：`keywords.json`。", ""]
+    lines += ["---", "", "改数据源：`sources.json`；改筛选权重：`keywords.json`；知识点：`lessons.json`。", ""]
     return "\n".join(lines)
 
 
-def render_push_html(top: dict[str, list[dict]], stats: dict, now: dt.datetime) -> str:
+def render_push_html(top: dict[str, list[dict]], stats: dict, now: dt.datetime, lesson: dict | None) -> str:
     parts = [f"<h3>{now:%m-%d} 情报简报</h3>"]
     for cat in CATEGORY_ORDER:
         items = top[cat]
@@ -343,6 +352,16 @@ def render_push_html(top: dict[str, list[dict]], stats: dict, now: dt.datetime) 
                 f'· <a href="{item["url"]}">{html.escape(item["title"])}</a><br>'
             )
         parts.append("</p>")
+
+    if lesson:
+        body = lesson["body"]
+        if len(body) > 320:
+            body = body[:320] + "…"
+        parts.append(
+            f"<p><b>每日一学 · {html.escape(lesson['title'])}</b><br>"
+            f"<span style='color:#888'>{html.escape(lesson.get('tag', ''))}</span><br>"
+            f"{html.escape(body)}</p>"
+        )
 
     name, url = WATCHLIST[now.timetuple().tm_yday % len(WATCHLIST)]
     parts.append(f'<p><b>今日盯一个</b><br><a href="{url}">{name}</a></p>')
@@ -409,13 +428,16 @@ def main() -> int:
     stats = {"total": len(all_items), "picked": picked}
     logging.info("抓取 %s 条，去重后 %s 条，入选 %s 条", len(all_items), len(unique), picked)
 
-    md = render_markdown(top, stats, now)
+    lessons = load_json("lessons.json")
+    lesson = pick_lesson(lessons, now)
+
+    md = render_markdown(top, stats, now, lesson)
     out_file = OUT_DIR / f"情报-{now:%Y-%m-%d}.md"
     out_file.write_text(md, encoding="utf-8")
-    logging.info("已写入：%s", out_file)
+    logging.info("已写入：%s（每日一学：%s）", out_file, lesson["title"] if lesson else "无")
 
     title = f"{now:%m-%d} Rowan-Zhao早报｜{picked} 条精选"
-    pushed = False if "--no-push" in sys.argv else push_wechat(title, render_push_html(top, stats, now))
+    pushed = False if "--no-push" in sys.argv else push_wechat(title, render_push_html(top, stats, now, lesson))
 
     print("\n" + "=" * 56)
     print(f"完成：{out_file}")
