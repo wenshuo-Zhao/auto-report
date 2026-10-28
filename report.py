@@ -65,7 +65,7 @@ CATEGORY_LABEL = {
     "tech": "技术与工具",
 }
 CATEGORY_ORDER = ["job", "hk", "policy", "intl", "global", "research", "tech"]
-LIMITS = {"job": 2, "hk": 3, "policy": 2, "intl": 3, "global": 1, "research": 1, "tech": 2}
+LIMITS = {"job": 2, "hk": 3, "policy": 2, "intl": 3, "global": 2, "research": 1, "tech": 2}
 MAX_PER_SOURCE = 2
 
 # 相关性门槛：标题里必须出现至少一个"硬词"，否则再新也不要
