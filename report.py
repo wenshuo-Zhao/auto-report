@@ -307,13 +307,18 @@ def fmt_date(item: dict) -> str:
     return f"{item['published']:%m-%d}" if item["published"] else ""
 
 
-def pick_lesson(lessons: list[dict], now: dt.datetime) -> dict | None:
+def pick_lesson(lessons: list[dict], now: dt.datetime, start: dt.date | None = None):
+    """按开始日期排课；没有开始日期就按一年中的第几天轮换。"""
     if not lessons:
-        return None
-    return lessons[now.timetuple().tm_yday % len(lessons)]
+        return None, 0
+    if start:
+        idx = max((now.date() - start).days, 0)
+        return lessons[idx % len(lessons)], idx + 1
+    idx = now.timetuple().tm_yday
+    return lessons[idx % len(lessons)], idx
 
 
-def render_markdown(top: dict[str, list[dict]], stats: dict, now: dt.datetime, lesson: dict | None) -> str:
+def render_markdown(top: dict[str, list[dict]], stats: dict, now: dt.datetime, lesson: dict | None, day_no: int = 0) -> str:
     lines = [
         f"# 每日情报 · {now:%Y-%m-%d}",
         "",
@@ -332,7 +337,8 @@ def render_markdown(top: dict[str, list[dict]], stats: dict, now: dt.datetime, l
         lines.append("")
 
     if lesson:
-        lines += [f"## 每日一学 · {lesson['title']}", "", f"> {lesson.get('tag', '')}", "", lesson["body"], ""]
+        head = f"每日一学 · 第 {day_no} 天 · {lesson['title']}" if day_no else f"每日一学 · {lesson['title']}"
+        lines += [f"## {head}", "", f"> {lesson.get('tag', '')}", "", lesson["body"], ""]
 
     name, url = WATCHLIST[now.timetuple().tm_yday % len(WATCHLIST)]
     lines += ["## 今日盯一个", "", f"[{name}]({url}) — 点开看一眼有没有新公告。", ""]
@@ -340,7 +346,7 @@ def render_markdown(top: dict[str, list[dict]], stats: dict, now: dt.datetime, l
     return "\n".join(lines)
 
 
-def render_push_html(top: dict[str, list[dict]], stats: dict, now: dt.datetime, lesson: dict | None) -> str:
+def render_push_html(top: dict[str, list[dict]], stats: dict, now: dt.datetime, lesson: dict | None, day_no: int = 0) -> str:
     parts = [f"<h3>{now:%m-%d} 情报简报</h3>"]
     for cat in CATEGORY_ORDER:
         items = top[cat]
@@ -358,7 +364,7 @@ def render_push_html(top: dict[str, list[dict]], stats: dict, now: dt.datetime, 
         if len(body) > 320:
             body = body[:320] + "…"
         parts.append(
-            f"<p><b>每日一学 · {html.escape(lesson['title'])}</b><br>"
+            f"<p><b>每日一学 · 第 {day_no} 天 · {html.escape(lesson['title'])}</b><br>"
             f"<span style='color:#888'>{html.escape(lesson.get('tag', ''))}</span><br>"
             f"{html.escape(body)}</p>"
         )
@@ -428,16 +434,22 @@ def main() -> int:
     stats = {"total": len(all_items), "picked": picked}
     logging.info("抓取 %s 条，去重后 %s 条，入选 %s 条", len(all_items), len(unique), picked)
 
-    lessons = load_json("lessons.json")
-    lesson = pick_lesson(lessons, now)
+    lesson_data = load_json("lessons.json")
+    if isinstance(lesson_data, dict):
+        lessons = lesson_data.get("lessons", [])
+        start_s = lesson_data.get("start")
+        start = dt.date.fromisoformat(start_s) if start_s else None
+    else:
+        lessons, start = lesson_data, None
+    lesson, day_no = pick_lesson(lessons, now, start)
 
-    md = render_markdown(top, stats, now, lesson)
+    md = render_markdown(top, stats, now, lesson, day_no)
     out_file = OUT_DIR / f"情报-{now:%Y-%m-%d}.md"
     out_file.write_text(md, encoding="utf-8")
     logging.info("已写入：%s（每日一学：%s）", out_file, lesson["title"] if lesson else "无")
 
     title = f"{now:%m-%d} Rowan-Zhao早报｜{picked} 条精选"
-    pushed = False if "--no-push" in sys.argv else push_wechat(title, render_push_html(top, stats, now, lesson))
+    pushed = False if "--no-push" in sys.argv else push_wechat(title, render_push_html(top, stats, now, lesson, day_no))
 
     print("\n" + "=" * 56)
     print(f"完成：{out_file}")
