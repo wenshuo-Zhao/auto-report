@@ -50,20 +50,22 @@ UA = {
     )
 }
 
-# 不用系统代理：避免被本机加速工具（如 Watt Toolkit）的证书拦截
-SESSION = requests.Session()
-SESSION.trust_env = False
+# 两套会话：优先走系统代理（有 VPN 时），失败再直连（无 VPN 时）
+SESSION = requests.Session()          # 跟随系统代理（Phantom 等）
+DIRECT = requests.Session()
+DIRECT.trust_env = False              # 直连，不受残留代理影响
 
 CATEGORY_LABEL = {
     "job": "招聘信号",
     "hk": "香港",
     "policy": "政策",
     "intl": "国际行业",
+    "global": "全球视野",
     "research": "研究前沿",
     "tech": "技术与工具",
 }
-CATEGORY_ORDER = ["job", "hk", "policy", "intl", "research", "tech"]
-LIMITS = {"job": 2, "hk": 3, "policy": 2, "intl": 3, "research": 1, "tech": 2}
+CATEGORY_ORDER = ["job", "hk", "policy", "intl", "global", "research", "tech"]
+LIMITS = {"job": 2, "hk": 3, "policy": 2, "intl": 3, "global": 1, "research": 1, "tech": 2}
 MAX_PER_SOURCE = 2
 
 # 相关性门槛：标题里必须出现至少一个"硬词"，否则再新也不要
@@ -123,13 +125,14 @@ def load_json(name: str):
 
 def fetch_text(url: str) -> str | None:
     for attempt in range(1, 3):
-        try:
-            resp = SESSION.get(url, headers=UA, timeout=TIMEOUT)
-            resp.raise_for_status()
-            resp.encoding = resp.apparent_encoding or resp.encoding
-            return resp.text
-        except Exception as exc:  # noqa: BLE001
-            logging.warning("请求失败（第 %s 次）%s：%s", attempt, url, exc)
+        for sess, mode in ((SESSION, "代理"), (DIRECT, "直连")):
+            try:
+                resp = sess.get(url, headers=UA, timeout=TIMEOUT)
+                resp.raise_for_status()
+                resp.encoding = resp.apparent_encoding or resp.encoding
+                return resp.text
+            except Exception as exc:  # noqa: BLE001
+                logging.warning("请求失败（第 %s 次/%s）%s：%s", attempt, mode, url, exc)
     logging.error("放弃：%s", url)
     return None
 
@@ -251,6 +254,8 @@ def qualifies(item: dict) -> bool:
     cat = item["category"]
     if cat == "job":
         return True
+    if cat == "global":
+        return True
     if cat == "tech":
         return any(keyword_hit(title, k) for k in TECH_HINTS)
     if cat == "research":
@@ -269,8 +274,8 @@ def select_top(items: list[dict]) -> dict[str, list[dict]]:
         cat = item["category"]
         if cat not in by_cat or len(by_cat[cat]) >= LIMITS[cat]:
             continue
-        # 国际行业：每个来源最多 1 条，保证看到不同国家/媒体
-        cap = 1 if cat == "intl" else MAX_PER_SOURCE
+        # 国际行业 / 全球视野：每个来源最多 1 条，保证看到不同媒体
+        cap = 1 if cat in ("intl", "global") else MAX_PER_SOURCE
         key = (cat, item["source"])
         if counts.get(key, 0) >= cap:
             continue

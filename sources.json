@@ -63,6 +63,24 @@
     "lang": "en"
   },
   {
+    "name": "The Economist · Leaders",
+    "category": "global",
+    "type": "rss",
+    "url": "https://www.economist.com/leaders/rss.xml",
+    "weight": 1.2,
+    "limit": 30,
+    "lang": "en"
+  },
+  {
+    "name": "BBC News",
+    "category": "global",
+    "type": "rss",
+    "url": "https://feeds.bbci.co.uk/news/rss.xml",
+    "weight": 1.0,
+    "limit": 30,
+    "lang": "en"
+  },
+  {
     "name": "arXiv cs.CE",
     "category": "research",
     "type": "rss",
