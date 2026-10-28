@@ -31,6 +31,9 @@ auto-report/
 | 专业视角 | Railway Gazette（RSS） | 铁路与轨道交通 |
 | 全球视野 | The Economist · Leaders（RSS） | 全球政经社论 |
 | 全球视野 | BBC News（RSS） | 国际新闻 |
+| 全球财经 | WSJ Markets（RSS） | 华尔街日报市场版 |
+| 全球财经 | CNBC（RSS） | 财经快讯 |
+| 全球财经 | MarketWatch（RSS） | 市场与个股 |
 | 研究前沿 | arXiv cs.CE（Atom） | 土木工程计算与 AI 论文 |
 | 技术与变现 | Hacker News（RSS） | 技术趋势 |
 | 技术与变现 | GitHub Trending（RSS） | 开源项目 |
@@ -39,6 +42,8 @@ auto-report/
 | 技术与变现 | OpenAI Blog（RSS） | AI 行业动态 |
 | 技术与变现 | Hugging Face Blog（RSS） | 开源模型与工具 |
 | 技术与变现 | Ars Technica（RSS） | 科技深度报道 |
+| 技术与变现 | TechCrunch（RSS） | 创业与融资 |
+| 技术与变现 | TLDR AI（RSS） | AI 每日摘要 |
 
 ## 筛选逻辑（三层）
 

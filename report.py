@@ -61,11 +61,12 @@ CATEGORY_LABEL = {
     "policy": "政策",
     "intl": "专业视角",
     "global": "全球视野",
+    "finance": "全球财经",
     "research": "研究前沿",
     "tech": "技术与变现",
 }
-CATEGORY_ORDER = ["job", "hk", "policy", "intl", "global", "research", "tech"]
-LIMITS = {"job": 2, "hk": 3, "policy": 2, "intl": 3, "global": 2, "research": 1, "tech": 3}
+CATEGORY_ORDER = ["job", "hk", "policy", "intl", "global", "finance", "research", "tech"]
+LIMITS = {"job": 2, "hk": 3, "policy": 2, "intl": 3, "global": 2, "finance": 2, "research": 1, "tech": 4}
 MAX_PER_SOURCE = 2
 
 # 相关性门槛：标题里必须出现至少一个"硬词"，否则再新也不要
@@ -91,7 +92,12 @@ INTL_HINTS = MUST_HAVE + [
 ]
 POLICY_HINTS = [
     "规划", "投资", "项目", "批复", "标准", "规范", "工程", "建设",
-    "基础设施", "产业", "能源", "交通", "招标", "采购",
+    "基础设施", "产业", "能源", "交通", "招标", "采购",]
+FINANCE_HINTS = [
+    "market", "stock", "bond", "yield", "inflation", "rate", "fed",
+    "economy", "economic", "trade", "tariff", "bank", "currency",
+    "dollar", "oil", "gold", "earnings", "ipo", "investor", "fund",
+    "debt", "gdp", "recession", "equity", "valuation",
 ]
 
 # 每天轮换一个"求职雷达"入口（按你关注的城市：深圳 / 济南 / 全国平台）
@@ -249,15 +255,29 @@ def dedupe(items: list[dict]) -> list[dict]:
     return kept
 
 
+def is_recent(item: dict, days: int = 7) -> bool:
+    """没有日期的当作新的；有日期的超过 N 天就丢掉（防止 RSS 里翻出旧文）。"""
+    pub = item.get("published")
+    if not pub:
+        return True
+    return (dt.datetime.now() - pub).days <= days
+
+
 def qualifies(item: dict) -> bool:
     title = item["title"]
     text = title + " " + item.get("desc", "")
     cat = item["category"]
+    if cat == "finance":
+        return is_recent(item, 7) and any(keyword_hit(text, k) for k in FINANCE_HINTS)
+    if cat == "global":
+        return is_recent(item, 7)
     if item.get("gate", True) is False:
-        return True
+        return is_recent(item, 7)
     if cat == "job":
         return True
     if cat == "global":
+        return True
+    if cat == "finance":
         return True
     if cat == "tech":
         return any(keyword_hit(title, k) for k in TECH_HINTS)
@@ -277,8 +297,8 @@ def select_top(items: list[dict]) -> dict[str, list[dict]]:
         cat = item["category"]
         if cat not in by_cat or len(by_cat[cat]) >= LIMITS[cat]:
             continue
-        # 国际行业 / 全球视野：每个来源最多 1 条，保证看到不同媒体
-        cap = 1 if cat in ("intl", "global") else MAX_PER_SOURCE
+        # 国际/全球/财经/技术：每个来源最多 1 条，保证看到不同媒体
+        cap = 1 if cat in ("intl", "global", "finance", "tech") else MAX_PER_SOURCE
         key = (cat, item["source"])
         if counts.get(key, 0) >= cap:
             continue

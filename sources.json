@@ -81,6 +81,36 @@
     "lang": "en"
   },
   {
+    "name": "WSJ Markets",
+    "category": "finance",
+    "type": "rss",
+    "url": "https://feeds.a.dj.com/rss/RSSMarketsMain.xml",
+    "weight": 1.0,
+    "limit": 20,
+    "lang": "en",
+    "gate": false
+  },
+  {
+    "name": "CNBC",
+    "category": "finance",
+    "type": "rss",
+    "url": "https://www.cnbc.com/id/20910258/device/rss/rss.html",
+    "weight": 0.9,
+    "limit": 20,
+    "lang": "en",
+    "gate": false
+  },
+  {
+    "name": "MarketWatch",
+    "category": "finance",
+    "type": "rss",
+    "url": "http://feeds.marketwatch.com/marketwatch/topstories/",
+    "weight": 0.9,
+    "limit": 15,
+    "lang": "en",
+    "gate": false
+  },
+  {
     "name": "arXiv cs.CE",
     "category": "research",
     "type": "rss",
@@ -161,6 +191,26 @@
     "url": "https://arstechnica.com/feed/",
     "weight": 0.9,
     "limit": 20,
+    "lang": "en",
+    "gate": false
+  },
+  {
+    "name": "TechCrunch",
+    "category": "tech",
+    "type": "rss",
+    "url": "https://techcrunch.com/feed/",
+    "weight": 0.9,
+    "limit": 20,
+    "lang": "en",
+    "gate": false
+  },
+  {
+    "name": "TLDR AI",
+    "category": "tech",
+    "type": "rss",
+    "url": "https://tldr.tech/api/rss/ai",
+    "weight": 1.0,
+    "limit": 10,
     "lang": "en",
     "gate": false
   }
