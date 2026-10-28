@@ -50,6 +50,10 @@ UA = {
     )
 }
 
+# 不用系统代理：避免被本机加速工具（如 Watt Toolkit）的证书拦截
+SESSION = requests.Session()
+SESSION.trust_env = False
+
 CATEGORY_LABEL = {
     "job": "招聘信号",
     "hk": "香港",
@@ -59,7 +63,7 @@ CATEGORY_LABEL = {
     "tech": "技术与工具",
 }
 CATEGORY_ORDER = ["job", "hk", "policy", "intl", "research", "tech"]
-LIMITS = {"job": 2, "hk": 3, "policy": 2, "intl": 2, "research": 1, "tech": 2}
+LIMITS = {"job": 2, "hk": 3, "policy": 2, "intl": 3, "research": 1, "tech": 2}
 MAX_PER_SOURCE = 2
 
 # 相关性门槛：标题里必须出现至少一个"硬词"，否则再新也不要
@@ -77,6 +81,11 @@ TECH_HINTS = [
 RESEARCH_HINTS = [
     "construction", "infrastructure", "digital twin", "BIM", "LLM",
     "machine learning", "project management", "asset management",
+]
+INTL_HINTS = MUST_HAVE + [
+    "project", "water", "rail", "road", "bridge", "tunnel", "housing",
+    "energy", "contract", "bid", "build", "engineer", "dam", "port",
+    "airport", "plant", "grid", "sewer", "flood",
 ]
 POLICY_HINTS = [
     "规划", "投资", "项目", "批复", "标准", "规范", "工程", "建设",
@@ -115,7 +124,7 @@ def load_json(name: str):
 def fetch_text(url: str) -> str | None:
     for attempt in range(1, 3):
         try:
-            resp = requests.get(url, headers=UA, timeout=TIMEOUT)
+            resp = SESSION.get(url, headers=UA, timeout=TIMEOUT)
             resp.raise_for_status()
             resp.encoding = resp.apparent_encoding or resp.encoding
             return resp.text
@@ -246,6 +255,8 @@ def qualifies(item: dict) -> bool:
         return any(keyword_hit(title, k) for k in TECH_HINTS)
     if cat == "research":
         return any(keyword_hit(title, k) for k in RESEARCH_HINTS)
+    if cat == "intl":
+        return any(keyword_hit(title, k) for k in INTL_HINTS)
     if cat == "policy":
         return any(keyword_hit(text, k) for k in POLICY_HINTS)
     return any(keyword_hit(title, k) for k in MUST_HAVE)
@@ -253,15 +264,18 @@ def qualifies(item: dict) -> bool:
 
 def select_top(items: list[dict]) -> dict[str, list[dict]]:
     by_cat: dict[str, list[dict]] = {c: [] for c in CATEGORY_ORDER}
-    counts: dict[str, int] = {}
+    counts: dict[tuple[str, str], int] = {}
     for item in sorted(items, key=lambda x: x["score"], reverse=True):
         cat = item["category"]
         if cat not in by_cat or len(by_cat[cat]) >= LIMITS[cat]:
             continue
-        if counts.get(item["source"], 0) >= MAX_PER_SOURCE:
+        # 国际行业：每个来源最多 1 条，保证看到不同国家/媒体
+        cap = 1 if cat == "intl" else MAX_PER_SOURCE
+        key = (cat, item["source"])
+        if counts.get(key, 0) >= cap:
             continue
         by_cat[cat].append(item)
-        counts[item["source"]] = counts.get(item["source"], 0) + 1
+        counts[key] = counts.get(key, 0) + 1
 
     # 招聘栏目经常为空：用"今日盯一个"兜底，保证每天有一个动作
     if not by_cat["job"]:
@@ -342,7 +356,7 @@ def push_wechat(title: str, content: str) -> bool:
     }
     for attempt in range(1, 3):
         try:
-            data = requests.post(
+            data = SESSION.post(
                 "https://www.pushplus.plus/send", json=payload, timeout=TIMEOUT
             ).json()
             if data.get("code") == 200:
@@ -393,7 +407,7 @@ def main() -> int:
     logging.info("已写入：%s", out_file)
 
     title = f"{now:%m-%d} Rowan-Zhao早报｜{picked} 条精选"
-    pushed = push_wechat(title, render_push_html(top, stats, now))
+    pushed = False if "--no-push" in sys.argv else push_wechat(title, render_push_html(top, stats, now))
 
     print("\n" + "=" * 56)
     print(f"完成：{out_file}")

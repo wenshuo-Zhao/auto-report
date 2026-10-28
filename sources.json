@@ -27,6 +27,24 @@
     "lang": "en"
   },
   {
+    "name": "Construction Enquirer",
+    "category": "intl",
+    "type": "rss",
+    "url": "https://www.constructionenquirer.com/feed/",
+    "weight": 1.0,
+    "limit": 15,
+    "lang": "en"
+  },
+  {
+    "name": "The Construction Index",
+    "category": "intl",
+    "type": "rss",
+    "url": "https://www.theconstructionindex.co.uk/news/rss",
+    "weight": 1.0,
+    "limit": 20,
+    "lang": "en"
+  },
+  {
     "name": "Global Construction Review",
     "category": "intl",
     "type": "rss",

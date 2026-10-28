@@ -24,6 +24,8 @@ auto-report/
 | 政策 | 国家发改委（HTML） | 投资、规划、产业 |
 | 国际行业 | Construction Dive（RSS） | 美国/全球工程与数据中心建设 |
 | 国际行业 | Global Construction Review（RSS） | 全球大型项目 |
+| 国际行业 | Construction Enquirer（RSS） | 英国建筑业新闻 |
+| 国际行业 | The Construction Index（RSS） | 英国土木工程新闻 |
 | 研究前沿 | arXiv cs.CE（Atom） | 土木工程计算与 AI 论文 |
 | 技术与工具 | Hacker News（RSS） | 技术趋势 |
 | 技术与工具 | GitHub Trending（RSS） | 开源项目 |
