@@ -1,0 +1,73 @@
+[
+  {
+    "name": "香港政府新闻公报",
+    "category": "hk",
+    "type": "rss",
+    "url": "https://www.info.gov.hk/gia/rss/general_zh.xml",
+    "weight": 1.0,
+    "limit": 400
+  },
+  {
+    "name": "国家发改委",
+    "category": "policy",
+    "type": "html",
+    "url": "https://www.ndrc.gov.cn/xwdt/xwfb/",
+    "selector": "ul.u-list li a",
+    "base": "https://www.ndrc.gov.cn/xwdt/xwfb/",
+    "weight": 1.2,
+    "limit": 15
+  },
+  {
+    "name": "Construction Dive",
+    "category": "intl",
+    "type": "rss",
+    "url": "https://www.constructiondive.com/feeds/news/",
+    "weight": 1.1,
+    "limit": 20,
+    "lang": "en"
+  },
+  {
+    "name": "Global Construction Review",
+    "category": "intl",
+    "type": "rss",
+    "url": "https://www.globalconstructionreview.com/feed/",
+    "weight": 1.0,
+    "limit": 20,
+    "lang": "en"
+  },
+  {
+    "name": "arXiv cs.CE",
+    "category": "research",
+    "type": "rss",
+    "url": "https://export.arxiv.org/api/query?search_query=cat:cs.CE&sortBy=submittedDate&sortOrder=descending&max_results=15",
+    "weight": 1.0,
+    "limit": 15,
+    "lang": "en"
+  },
+  {
+    "name": "Hacker News",
+    "category": "tech",
+    "type": "rss",
+    "url": "https://hnrss.org/frontpage",
+    "weight": 1.0,
+    "limit": 30,
+    "lang": "en"
+  },
+  {
+    "name": "GitHub Trending",
+    "category": "tech",
+    "type": "rss",
+    "url": "https://mshibanami.github.io/GitHubTrendingRSS/daily/all.xml",
+    "weight": 0.9,
+    "limit": 40,
+    "lang": "en"
+  },
+  {
+    "name": "少数派",
+    "category": "tech",
+    "type": "rss",
+    "url": "https://sspai.com/feed",
+    "weight": 0.9,
+    "limit": 12
+  }
+]
