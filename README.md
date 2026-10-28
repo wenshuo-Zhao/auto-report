@@ -28,6 +28,7 @@ auto-report/
 | 专业视角 | Construction Enquirer（RSS） | 英国建筑业新闻 |
 | 专业视角 | The Construction Index（RSS） | 英国土木工程新闻 |
 | 专业视角 | Tunnelling Journal（RSS） | 隧道与地下工程 |
+| 专业视角 | Railway Gazette（RSS） | 铁路与轨道交通 |
 | 全球视野 | The Economist · Leaders（RSS） | 全球政经社论 |
 | 全球视野 | BBC News（RSS） | 国际新闻 |
 | 研究前沿 | arXiv cs.CE（Atom） | 土木工程计算与 AI 论文 |
@@ -37,6 +38,7 @@ auto-report/
 | 技术与变现 | Product Hunt（RSS） | 新产品（变现信号） |
 | 技术与变现 | OpenAI Blog（RSS） | AI 行业动态 |
 | 技术与变现 | Hugging Face Blog（RSS） | 开源模型与工具 |
+| 技术与变现 | Ars Technica（RSS） | 科技深度报道 |
 
 ## 筛选逻辑（三层）
 
