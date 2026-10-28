@@ -114,5 +114,35 @@
     "url": "https://sspai.com/feed",
     "weight": 0.9,
     "limit": 12
+  },
+  {
+    "name": "Product Hunt",
+    "category": "tech",
+    "type": "rss",
+    "url": "https://www.producthunt.com/feed",
+    "weight": 0.9,
+    "limit": 20,
+    "lang": "en",
+    "gate": false
+  },
+  {
+    "name": "OpenAI Blog",
+    "category": "tech",
+    "type": "rss",
+    "url": "https://openai.com/blog/rss.xml",
+    "weight": 1.0,
+    "limit": 15,
+    "lang": "en",
+    "gate": false
+  },
+  {
+    "name": "Hugging Face Blog",
+    "category": "tech",
+    "type": "rss",
+    "url": "https://huggingface.co/blog/feed.xml",
+    "weight": 0.9,
+    "limit": 15,
+    "lang": "en",
+    "gate": false
   }
 ]

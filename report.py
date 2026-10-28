@@ -59,13 +59,13 @@ CATEGORY_LABEL = {
     "job": "招聘信号",
     "hk": "香港",
     "policy": "政策",
-    "intl": "国际行业",
+    "intl": "专业视角",
     "global": "全球视野",
     "research": "研究前沿",
-    "tech": "技术与工具",
+    "tech": "技术与变现",
 }
 CATEGORY_ORDER = ["job", "hk", "policy", "intl", "global", "research", "tech"]
-LIMITS = {"job": 2, "hk": 3, "policy": 2, "intl": 3, "global": 2, "research": 1, "tech": 2}
+LIMITS = {"job": 2, "hk": 3, "policy": 2, "intl": 3, "global": 2, "research": 1, "tech": 3}
 MAX_PER_SOURCE = 2
 
 # 相关性门槛：标题里必须出现至少一个"硬词"，否则再新也不要
@@ -172,6 +172,7 @@ def parse_source(src: dict) -> list[dict]:
                     "published": parse_published(entry),
                     "weight": src.get("weight", 1.0),
                     "lang": src.get("lang", "zh"),
+                    "gate": src.get("gate", True),
                 }
             )
 
@@ -252,6 +253,8 @@ def qualifies(item: dict) -> bool:
     title = item["title"]
     text = title + " " + item.get("desc", "")
     cat = item["category"]
+    if item.get("gate", True) is False:
+        return True
     if cat == "job":
         return True
     if cat == "global":

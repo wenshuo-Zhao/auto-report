@@ -22,20 +22,26 @@ auto-report/
 |---|---|---|
 | 香港 | 香港政府新闻公报（RSS） | 工务、基建、招聘、政策 |
 | 政策 | 国家发改委（HTML） | 投资、规划、产业 |
-| 国际行业 | Construction Dive（RSS） | 美国/全球工程与数据中心建设 |
-| 国际行业 | Global Construction Review（RSS） | 全球大型项目 |
-| 国际行业 | Construction Enquirer（RSS） | 英国建筑业新闻 |
-| 国际行业 | The Construction Index（RSS） | 英国土木工程新闻 |
+| 专业视角 | Construction Dive（RSS） | 美国/全球工程与数据中心建设 |
+| 专业视角 | Global Construction Review（RSS） | 全球大型项目 |
+| 专业视角 | Construction Enquirer（RSS） | 英国建筑业新闻 |
+| 专业视角 | The Construction Index（RSS） | 英国土木工程新闻 |
+| 专业视角 | Tunnelling Journal（RSS） | 隧道与地下工程 |
+| 全球视野 | The Economist · Leaders（RSS） | 全球政经社论 |
+| 全球视野 | BBC News（RSS） | 国际新闻 |
 | 研究前沿 | arXiv cs.CE（Atom） | 土木工程计算与 AI 论文 |
-| 技术与工具 | Hacker News（RSS） | 技术趋势 |
-| 技术与工具 | GitHub Trending（RSS） | 开源项目 |
-| 技术与工具 | 少数派（RSS） | 中文效率工具 |
+| 技术与变现 | Hacker News（RSS） | 技术趋势 |
+| 技术与变现 | GitHub Trending（RSS） | 开源项目 |
+| 技术与变现 | 少数派（RSS） | 中文效率工具 |
+| 技术与变现 | Product Hunt（RSS） | 新产品（变现信号） |
+| 技术与变现 | OpenAI Blog（RSS） | AI 行业动态 |
+| 技术与变现 | Hugging Face Blog（RSS） | 开源模型与工具 |
 
 ## 筛选逻辑（三层）
 
-1. **硬门槛**：标题必须出现"工务/基建/建造/BIM/数字孪生/招聘/construction…"等硬词，否则直接丢；
+1. **硬门槛**：标题必须出现"工务/基建/建造/BIM/数字孪生/招聘/construction…"等硬词，否则直接丢（全球视野/变现类不受此限）；
 2. **关键词加权**：不同词不同权重（招聘 6 分、BIM 4 分、规划 2 分），再叠加来源权重和时效；
-3. **去重与限额**：标题相似度 >0.82 视为重复；每个来源最多 2 条；每个分类有上限（招聘 2、香港 3、政策 2、国际 2、研究 1、技术 2）。
+3. **去重与限额**：标题相似度 >0.82 视为重复；每个分类有上限（招聘 2、香港 3、政策 2、专业视角 3、全球视野 2、研究 1、技术与变现 3），国际/全球类每个来源最多 1 条。
 
 ## 怎么改
 
