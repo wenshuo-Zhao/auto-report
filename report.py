@@ -354,6 +354,9 @@ def render_markdown(top: dict[str, list[dict]], stats: dict, now: dt.datetime, l
             d = fmt_date(item)
             tag = f" `{item['source']}`" if item["lang"] == "en" else f" · {item['source']}"
             lines.append(f"- [{item['title']}]({item['url']}){tag}{(' · ' + d) if d else ''}")
+            if item.get("summary"):
+                extra = " · ".join(x for x in (item.get("use", ""), item.get("worth", "")) if x)
+                lines.append(f"  > {item['summary']}" + (f"（{extra}）" if extra else ""))
         lines.append("")
 
     if lesson:
@@ -377,6 +380,13 @@ def render_push_html(top: dict[str, list[dict]], stats: dict, now: dt.datetime, 
             parts.append(
                 f'· <a href="{item["url"]}">{html.escape(item["title"])}</a><br>'
             )
+            if item.get("summary"):
+                extra = " · ".join(x for x in (item.get("use", ""), item.get("worth", "")) if x)
+                parts.append(
+                    f"<span style='color:#888;font-size:13px'>{html.escape(item['summary'])}"
+                    + (f"（{html.escape(extra)}）" if extra else "")
+                    + "</span><br>"
+                )
         parts.append("</p>")
 
     if lesson:
@@ -471,6 +481,26 @@ def main() -> int:
     (OUT_DIR / f"items-{now:%Y-%m-%d}.json").write_text(
         json.dumps(export, ensure_ascii=False, indent=2), encoding="utf-8"
     )
+
+    # AI 摘要（DeepSeek）；失败不影响主流程
+    if "--no-enrich" not in sys.argv and export:
+        try:
+            from enrich import summarize
+
+            rows = summarize(export)
+            if rows:
+                idx = 0
+                for cat in CATEGORY_ORDER:
+                    for it in top[cat]:
+                        row = rows[idx] if idx < len(rows) else {}
+                        if row:
+                            it["summary"] = row.get("s", "")
+                            it["use"] = row.get("u", "")
+                            it["worth"] = row.get("w", "")
+                        idx += 1
+                logging.info("已附加 AI 摘要 %d 条", len(rows))
+        except Exception as exc:  # noqa: BLE001
+            logging.warning("摘要模块异常：%s", exc)
 
     lesson_data = load_json("lessons.json")
     if isinstance(lesson_data, dict):
