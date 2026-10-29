@@ -454,6 +454,24 @@ def main() -> int:
     stats = {"total": len(all_items), "picked": picked}
     logging.info("抓取 %s 条，去重后 %s 条，入选 %s 条", len(all_items), len(unique), picked)
 
+    # 导出结构化数据，供 enrich.py 生成摘要
+    export = []
+    for cat in CATEGORY_ORDER:
+        for it in top[cat]:
+            export.append(
+                {
+                    "category": cat,
+                    "source": it["source"],
+                    "title": it["title"],
+                    "url": it["url"],
+                    "desc": it.get("desc", ""),
+                    "date": f"{it['published']:%Y-%m-%d}" if it.get("published") else "",
+                }
+            )
+    (OUT_DIR / f"items-{now:%Y-%m-%d}.json").write_text(
+        json.dumps(export, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
+
     lesson_data = load_json("lessons.json")
     if isinstance(lesson_data, dict):
         lessons = lesson_data.get("lessons", [])
